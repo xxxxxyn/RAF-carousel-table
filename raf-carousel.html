@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>requestAnimationFrame无缝轮播表</title>
+</head>
+<body>
+<div class="out">
+    <ul id="moveBox">
+        <li>123</li>
+        <li>456</li>
+        <li>789</li>
+        <li>159</li>
+        <li>000</li>
+        <li>last one</li>
+        <li>123</li>
+        <li>456</li>
+        <li>789</li>
+        <li>159</li>
+        <li>000</li>
+        <li>last one</li>
+    </ul>
+</div>
+<script>
+    let moveBox = document.getElementById('moveBox')
+    //移动过的高度
+    let count = 0
+    //一个loop的高度
+    let oneLoopHeight = moveBox.offsetHeight / 2
+    //raf的id，用于暂停
+    let idRAF
+
+    function carousel() {
+        if (parseInt(moveBox.style.top) > -oneLoopHeight) {
+            count = count - 0.5
+            moveBox.style.top = count + 'px'
+            idRAF = requestAnimationFrame(carousel);
+        } else {
+
+            count = 0
+            moveBox.style.top = '0px'
+            idRAF = requestAnimationFrame(carousel);
+        }
+    }
+
+    carousel();
+
+    moveBox.addEventListener('click', function () {
+        window.cancelAnimationFrame(idRAF);
+        countRunAgain()
+    })
+
+    function countRunAgain() {
+        setTimeout(carousel, '2000')
+    }
+
+</script>
+</body>
+<style>
+    .out {
+        width: 100px;
+        height: 100px;
+        top: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #moveBox {
+        position: absolute;
+        top: 0;
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+    }
+
+    li {
+        display: inline-block;
+        height: 20px;
+        width: 100px;
+    }
+
+
+</style>
+</html>
