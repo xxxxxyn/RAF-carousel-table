@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>requestAnimationFrame无缝轮播表</title>
+    <title>requestAnimationFrame轮播表</title>
 </head>
 <body>
 <div class="out">
@@ -22,37 +22,71 @@
     </ul>
 </div>
 <script>
-    let moveBox = document.getElementById('moveBox')
-    //移动过的高度
-    let count = 0
-    //一个loop的高度
-    let oneLoopHeight = moveBox.offsetHeight / 2
-    //raf的id，用于暂停
-    let idRAF
+  let step = 0
+  let moveBox = document.getElementById('moveBox')
+  let liArr=moveBox.children
+  console.log(typeof liArr)
+  //移动过的高度
+  let count = 0
+  //一个loop的高度
+  let oneLoopHeight = moveBox.offsetHeight / 2
+  //raf的id，用于暂停
+  let idRAF
+  //顿一下的计时器
+  var timerPauseAuto
+  //上一个点击暂停计时器
+  var timerLastStop
+  //点击的对象
+  var lastClickItem
 
-    function carousel() {
-        if (parseInt(moveBox.style.top) > -oneLoopHeight) {
-            count = count - 0.5
-            moveBox.style.top = count + 'px'
-            idRAF = requestAnimationFrame(carousel);
-        } else {
-
-            count = 0
-            moveBox.style.top = '0px'
-            idRAF = requestAnimationFrame(carousel);
-        }
+  function carousel() {
+    if(!!lastClickItem){
+      lastClickItem.classList.remove("active-line");
     }
 
-    carousel();
-
-    moveBox.addEventListener('click', function () {
-        window.cancelAnimationFrame(idRAF);
-        countRunAgain()
-    })
-
-    function countRunAgain() {
-        setTimeout(carousel, '2000')
+    if (parseInt(moveBox.style.top) > -oneLoopHeight) {
+      if(step===41){
+        window.cancelAnimationFrame(idRAF)
+        step = 0
+        countPause()
+      }else{
+        count = count - 0.5
+        moveBox.style.top = count + 'px'
+        idRAF = requestAnimationFrame(carousel)
+        step++
+      }
+    } else {
+      step = 0
+      count = 0
+      moveBox.style.top = '0px'
+      idRAF = requestAnimationFrame(carousel)
     }
+  }
+
+  carousel()
+
+  moveBox.addEventListener('click', function(e) {
+    window.cancelAnimationFrame(idRAF)
+    if(!!timerLastStop){
+      clearTimeout(timerLastStop)
+    }
+    countStopRunAgain(e.target)
+    // console.log(e.target)
+    if(!!lastClickItem){
+      lastClickItem.classList.remove("active-line");
+    }
+    e.target.className='active-line'
+    lastClickItem=e.target
+  })
+
+  function countStopRunAgain() {
+    clearTimeout(timerPauseAuto)
+    timerLastStop=setTimeout(carousel, '6000')
+  }
+
+  function countPause() {
+    timerPauseAuto=setTimeout(carousel, '1000')
+  }
 
 </script>
 </body>
@@ -61,6 +95,7 @@
         width: 100px;
         height: 100px;
         top: 20px;
+        background: #fffd9c;
         position: relative;
         overflow: hidden;
     }
@@ -77,6 +112,14 @@
         display: inline-block;
         height: 20px;
         width: 100px;
+    }
+
+    li:hover{
+        background: #ffc66c;
+    }
+
+    .active-line{
+        background: #ffc66c;
     }
 
 
